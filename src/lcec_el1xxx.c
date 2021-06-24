@@ -35,6 +35,7 @@ static const lcec_pindesc_t slave_pins[] = {
 void lcec_el1xxx_read(struct lcec_slave *slave, long period);
 
 int lcec_el1xxx_init(int comp_id, struct lcec_slave *slave, ec_pdo_entry_reg_t *pdo_entry_regs) {
+  rtapi_print_msg(RTAPI_MSG_ERR,"EL1xxx INIT begun... \n");
   lcec_master_t *master = slave->master;
   lcec_el1xxx_pin_t *hal_data;
   lcec_el1xxx_pin_t *pin;
@@ -62,7 +63,7 @@ int lcec_el1xxx_init(int comp_id, struct lcec_slave *slave, ec_pdo_entry_reg_t *
       return err;
     }
   }
-
+  rtapi_print_msg(RTAPI_MSG_ERR,"EL1xxx INIT finished... \n");
   return 0;
 }
 

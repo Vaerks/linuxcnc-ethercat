@@ -19,6 +19,8 @@
 #ifndef _LCEC_EL2202_H_
 #define _LCEC_EL2202_H_
 
+#include "lcec.h"
+
 /** \brief Product Code */
 #define LCEC_EL2202_PID 0x089A3052
 

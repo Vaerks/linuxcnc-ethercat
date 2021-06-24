@@ -41,16 +41,23 @@
 #include "lcec_el1904.h"
 #include "lcec_el2904.h"
 #include "lcec_el7041_1000.h"
-#include "lcec_el70x1.h"
 #include "lcec_el7211.h"
 #include "lcec_el7342.h"
-#include "lcec_el7411.h"
 #include "lcec_el95xx.h"
 #include "lcec_em7004.h"
 #include "lcec_stmds5k.h"
 #include "lcec_deasda.h"
 #include "lcec_omrg5.h"
 #include "lcec_ph3lm2rm.h"
+//#include "lcec_el3004.h"
+//#include "lcec_el6021.h"
+#include "lcec_el3202.h"
+#include "lcec_el3314.h"
+#include "lcec_el2014.h"
+#include "lcec_el30x4.h"
+#include "lcec_el5001.h"
+
+#include "config.h"
 
 #include "rtapi_app.h"
 
@@ -70,7 +77,6 @@ static const lcec_typelist_t types[] = {
   // bus coupler
   { lcecSlaveTypeEK1100, LCEC_EK1100_VID, LCEC_EK1100_PID, LCEC_EK1100_PDOS, NULL},
   { lcecSlaveTypeEK1110, LCEC_EK1110_VID, LCEC_EK1110_PID, LCEC_EK1110_PDOS, NULL},
-  { lcecSlaveTypeEK1122, LCEC_EK1122_VID, LCEC_EK1122_PID, LCEC_EK1122_PDOS, NULL},
 
   // AX5000 servo drives
   { lcecSlaveTypeAX5203, LCEC_AX5200_VID, LCEC_AX5203_PID, LCEC_AX5200_PDOS, lcec_ax5200_init},
@@ -103,6 +109,7 @@ static const lcec_typelist_t types[] = {
   { lcecSlaveTypeEL2002, LCEC_EL2xxx_VID, LCEC_EL2002_PID, LCEC_EL2002_PDOS, lcec_el2xxx_init},
   { lcecSlaveTypeEL2004, LCEC_EL2xxx_VID, LCEC_EL2004_PID, LCEC_EL2004_PDOS, lcec_el2xxx_init},
   { lcecSlaveTypeEL2008, LCEC_EL2xxx_VID, LCEC_EL2008_PID, LCEC_EL2008_PDOS, lcec_el2xxx_init},
+  { lcecSlaveTypeEL2014, LCEC_EL2014_VID, LCEC_EL2014_PID, LCEC_EL2014_PDOS, lcec_el2014_init},
   { lcecSlaveTypeEL2022, LCEC_EL2xxx_VID, LCEC_EL2022_PID, LCEC_EL2022_PDOS, lcec_el2xxx_init},
   { lcecSlaveTypeEL2024, LCEC_EL2xxx_VID, LCEC_EL2024_PID, LCEC_EL2024_PDOS, lcec_el2xxx_init},
   { lcecSlaveTypeEL2032, LCEC_EL2xxx_VID, LCEC_EL2032_PID, LCEC_EL2032_PDOS, lcec_el2xxx_init},
@@ -119,9 +126,7 @@ static const lcec_typelist_t types[] = {
   { lcecSlaveTypeEL2798, LCEC_EL2xxx_VID, LCEC_EL2798_PID, LCEC_EL2798_PDOS, lcec_el2xxx_init},
   { lcecSlaveTypeEL2809, LCEC_EL2xxx_VID, LCEC_EL2809_PID, LCEC_EL2809_PDOS, lcec_el2xxx_init},
 
-  { lcecSlaveTypeEP2008, LCEC_EL2xxx_VID, LCEC_EP2008_PID, LCEC_EP2008_PDOS, lcec_el2xxx_init},
   { lcecSlaveTypeEP2028, LCEC_EL2xxx_VID, LCEC_EP2028_PID, LCEC_EP2028_PDOS, lcec_el2xxx_init},
-  { lcecSlaveTypeEP2809, LCEC_EL2xxx_VID, LCEC_EP2809_PID, LCEC_EP2809_PDOS, lcec_el2xxx_init},
 
   // digital in/out
   { lcecSlaveTypeEL1859, LCEC_EL1859_VID, LCEC_EL1859_PID, LCEC_EL1859_PDOS, lcec_el1859_init},
@@ -137,8 +142,18 @@ static const lcec_typelist_t types[] = {
   // analog in, 2ch, 16 bits
   { lcecSlaveTypeEL3164, LCEC_EL31x4_VID, LCEC_EL3164_PID, LCEC_EL31x4_PDOS, lcec_el31x4_init},
 
+ // analog in  4ch, 12bits
+  { lcecSlaveTypeEL3004, LCEC_EL30x4_VID, LCEC_EL3004_PID, LCEC_EL30x4_PDOS, lcec_el30x4_init},
+  { lcecSlaveTypeEL3044, LCEC_EL30x4_VID, LCEC_EL3044_PID, LCEC_EL30x4_PDOS, lcec_el30x4_init},
+  { lcecSlaveTypeEL3054, LCEC_EL30x4_VID, LCEC_EL3054_PID, LCEC_EL30x4_PDOS, lcec_el30x4_init},
+  { lcecSlaveTypeEL3064, LCEC_EL30x4_VID, LCEC_EL3064_PID, LCEC_EL30x4_PDOS, lcec_el30x4_init},
+  //{ lcecSlaveTypeEL3004, LCEC_EL3004_VID, LCEC_EL3004_PID, LCEC_EL3004_PDOS, lcec_el3004_init},
+
   // analog in, 5ch, 16 bits
   { lcecSlaveTypeEL3255, LCEC_EL3255_VID, LCEC_EL3255_PID, LCEC_EL3255_PDOS, lcec_el3255_init},
+
+  // analog in pt100, 2ch 
+  { lcecSlaveTypeEL3202, LCEC_EL3202_VID, LCEC_EL3202_PID, LCEC_EL3202_PDOS, lcec_el3202_init},
 
   // analog out, 1ch, 12 bits
   { lcecSlaveTypeEL4001, LCEC_EL40x1_VID, LCEC_EL4001_PID, LCEC_EL40x1_PDOS, lcec_el40x1_init},
@@ -169,6 +184,7 @@ static const lcec_typelist_t types[] = {
   { lcecSlaveTypeEL4038, LCEC_EL40x8_VID, LCEC_EL4038_PID, LCEC_EL40x8_PDOS, lcec_el40x8_init},
 
   // encoder inputs
+  { lcecSlaveTypeEL5001, LCEC_EL5001_VID, LCEC_EL5001_PID, LCEC_EL5001_PDOS, lcec_el5001_init},
   { lcecSlaveTypeEL5101, LCEC_EL5101_VID, LCEC_EL5101_PID, LCEC_EL5101_PDOS, lcec_el5101_init},
   { lcecSlaveTypeEL5151, LCEC_EL5151_VID, LCEC_EL5151_PID, LCEC_EL5151_PDOS, lcec_el5151_init},
   { lcecSlaveTypeEL5152, LCEC_EL5152_VID, LCEC_EL5152_PID, LCEC_EL5152_PDOS, lcec_el5152_init},
@@ -177,20 +193,14 @@ static const lcec_typelist_t types[] = {
   { lcecSlaveTypeEL2521, LCEC_EL2521_VID, LCEC_EL2521_PID, LCEC_EL2521_PDOS, lcec_el2521_init},
 
   // stepper
-  { lcecSlaveTypeEL7031, LCEC_EL70x1_VID, LCEC_EL7031_PID, LCEC_EL70x1_PDOS, lcec_el7031_init},
-  { lcecSlaveTypeEL7041_0052, LCEC_EL70x1_VID, LCEC_EL7041_0052_PID, LCEC_EL70x1_PDOS, lcec_el7041_0052_init},
   { lcecSlaveTypeEL7041_1000, LCEC_EL7041_1000_VID, LCEC_EL7041_1000_PID, LCEC_EL7041_1000_PDOS, lcec_el7041_1000_init},
 
   // ac servo
-  { lcecSlaveTypeEL7201_9014, LCEC_EL7211_VID, LCEC_EL7201_9014_PID, LCEC_EL7211_PDOS, lcec_el7211_init},
   { lcecSlaveTypeEL7211, LCEC_EL7211_VID, LCEC_EL7211_PID, LCEC_EL7211_PDOS, lcec_el7211_init},
   { lcecSlaveTypeEL7221, LCEC_EL7211_VID, LCEC_EL7221_PID, LCEC_EL7211_PDOS, lcec_el7211_init},
 
   // dc servo
   { lcecSlaveTypeEL7342, LCEC_EL7342_VID, LCEC_EL7342_PID, LCEC_EL7342_PDOS, lcec_el7342_init},
-
-  // BLDC
-  { lcecSlaveTypeEL7411, LCEC_EL7411_VID, LCEC_EL7411_PID, LCEC_EL7411_PDOS, lcec_el7411_init},
 
   // power supply
   { lcecSlaveTypeEL9505, LCEC_EL95xx_VID, LCEC_EL9505_PID, LCEC_EL95xx_PDOS, lcec_el95xx_init},
@@ -214,32 +224,15 @@ static const lcec_typelist_t types[] = {
   { lcecSlaveTypeDeASDA, LCEC_DEASDA_VID, LCEC_DEASDA_PID, LCEC_DEASDA_PDOS, lcec_deasda_init},
 
   // Omron G5 series
-  { lcecSlaveTypeOmrG5_KNA5L,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KNA5L_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN01L,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN01L_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN02L,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN02L_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN04L,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN04L_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN01H,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN01H_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN02H,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN02H_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN04H,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN04H_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN08H,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN08H_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN10H,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN10H_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN15H,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN15H_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN20H,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN20H_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN30H,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN30H_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN50H,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN50H_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN75H,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN75H_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN150H, LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN150H_ECT_PID, LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN06F,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN06F_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN10F,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN10F_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN15F,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN15F_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN20F,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN20F_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN30F,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN30F_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN50F,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN50F_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN75F,  LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN75F_ECT_PID,  LCEC_OMRG5_PDOS, lcec_omrg5_init},
-  { lcecSlaveTypeOmrG5_KN150F, LCEC_OMRG5_VID, LCEC_OMRG5_R88D_KN150F_ECT_PID, LCEC_OMRG5_PDOS, lcec_omrg5_init},
+  { lcecSlaveTypeOmrG5, LCEC_OMRG5_VID, LCEC_OMRG5_PID, LCEC_OMRG5_PDOS, lcec_omrg5_init},
 
   // modusoft PH3LM2RM converter
   { lcecSlaveTypePh3LM2RM, LCEC_PH3LM2RM_VID, LCEC_PH3LM2RM_PID, LCEC_PH3LM2RM_PDOS, lcec_ph3lm2rm_init},
+
+  //1 channel serial interface
+//  { lcecSlaveTypeEL6021, LCEC_EL6021_VID, LCEC_EL6021_PID, LCEC_EL6021_PDOS, lcec_el6021_init},
+
+  { lcecSlaveTypeEL3314, LCEC_EL3314_VID, LCEC_EL3314_PID, LCEC_EL3314_PDOS, lcec_el3314_init},
 
   { lcecSlaveTypeInvalid }
 };
@@ -396,7 +389,6 @@ int rtapi_app_main(void) {
         }
       }
       pdo_entry_regs += slave->pdo_entry_count;
-
       // configure dc for this slave
       if (slave->dc_conf != NULL) {
         ecrt_slave_config_dc(slave->config, slave->dc_conf->assignActivate,
@@ -425,9 +417,12 @@ int rtapi_app_main(void) {
       if ((slave->hal_state_data = lcec_init_slave_state_hal(master->name, slave->name)) == NULL) {
         goto fail2;
       }
+        pdo_entry_regs -= slave->pdo_entry_count;
+      pdo_entry_regs += slave->pdo_entry_count;
     }
 
-    // terminate POD entries
+ 
+  
     pdo_entry_regs->index = 0;
 
     // register PDO entries
@@ -461,6 +456,7 @@ int rtapi_app_main(void) {
     // Get internal process data for domain
     master->process_data = ecrt_domain_data(master->domain);
     master->process_data_len = ecrt_domain_size(master->domain);
+
 
     // init hal data
     rtapi_snprintf(name, HAL_NAME_LEN, "%s.%s", LCEC_MODULE_NAME, master->name);
@@ -726,6 +722,7 @@ int lcec_parse_config(void) {
           }
           generic_sync_managers->index = 0xff;
         }
+
 
         // alloc sdo config memory
         if (slave_conf->sdoConfigLength > 0) {
